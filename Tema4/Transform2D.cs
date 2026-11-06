@@ -16,7 +16,11 @@ public class Transform2D
     public Matrix4 ModelMatrix =>
         Matrix4.CreateScale(Scale.X, Scale.Y, 1.0f)                               
      * Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(Rotation))         
-     * Matrix4.CreateTranslation(Position.X, Position.Y, Depth);             
+     * Matrix4.CreateTranslation(Position.X, Position.Y, Depth);        
+     // T1: dacă translația ar fi aplicată ÎNAINTEA rotației (T * R), întâi obiectul ar fi mutat în
+// Position, iar rotația s-ar face față de origine (0; 0), nu față de centrul obiectului.
+// Obiectul n-ar mai sta pe loc: ar descrie un arc de cerc în jurul originii (ca în Fig. 3b).
+// Exemplu: triunghiul din (-1,2; 1) rotit cu 45° ar ajunge în aprox. (-1,56; -0,14).     
 
     /// <summary>O copie independentă (folosită pentru readucerea scenei în starea inițială).</summary>
     public Transform2D Clone() => (Transform2D)MemberwiseClone();
