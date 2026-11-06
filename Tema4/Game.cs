@@ -66,9 +66,7 @@ public class Game : GameWindow
         AddObject("triunghi", Shapes.Triangle(),
           new Transform2D
           {
-              Position = new Vector2(-1.2f, 1.0f),
-              Rotation = 45,
-              Scale = new Vector2(1.5f, 0.5f)
+              Position = new Vector2(-1.2f, 1.0f)
           });
         AddObject("hexagon", Shapes.RegularPolygon(6, 0.5f),
                   new Transform2D { Position = new Vector2(2.0f, 1.0f) });
@@ -107,13 +105,33 @@ public class Game : GameWindow
         float dt = (float)args.Time;
         SceneObject sel = _scene[_selected];
 
-        const float moveSpeed = 2.0f;   // unități de lume pe secundă
-        if (KeyboardState.IsKeyDown(Keys.Left)) sel.Transform.Position.X -= moveSpeed * dt;
-        if (KeyboardState.IsKeyDown(Keys.Right)) sel.Transform.Position.X += moveSpeed * dt;
-        if (KeyboardState.IsKeyDown(Keys.Down)) sel.Transform.Position.Y -= moveSpeed * dt;
-        if (KeyboardState.IsKeyDown(Keys.Up)) sel.Transform.Position.Y += moveSpeed * dt;
+        // T2: Shift ținut apăsat = toate mișcările obiectului (săgeți, rotație, scalare) de 3 ori mai rapide
+float boost = KeyboardState.IsKeyDown(Keys.LeftShift) ? 3.0f : 1.0f;
 
-        // TODO (T2): Q / E rotesc obiectul, Z / X îl scalează
+        const float moveSpeed = 2.0f;   // unități de lume pe secundă
+        if (KeyboardState.IsKeyDown(Keys.Left))  sel.Transform.Position.X -= moveSpeed * boost * dt;
+        if (KeyboardState.IsKeyDown(Keys.Right)) sel.Transform.Position.X += moveSpeed * boost * dt;
+        if (KeyboardState.IsKeyDown(Keys.Down))  sel.Transform.Position.Y -= moveSpeed * boost * dt;
+        if (KeyboardState.IsKeyDown(Keys.Up))    sel.Transform.Position.Y += moveSpeed * boost * dt;
+
+        const float rotSpeed = 90.0f;   // grade pe secundă
+        if (KeyboardState.IsKeyDown(Keys.Q)) sel.Transform.Rotation += rotSpeed * boost * dt;
+        if (KeyboardState.IsKeyDown(Keys.E)) sel.Transform.Rotation -= rotSpeed * boost * dt;
+
+        float scaleFactor = MathF.Pow(1.5f, boost * dt);   // factorul pentru UN cadru
+        if (KeyboardState.IsKeyDown(Keys.Z)) sel.Transform.Scale /= scaleFactor;
+        if (KeyboardState.IsKeyDown(Keys.X)) sel.Transform.Scale *= scaleFactor;
+
+        sel.Transform.Scale.X = Math.Clamp(sel.Transform.Scale.X, 0.1f, 10.0f);
+        sel.Transform.Scale.Y = Math.Clamp(sel.Transform.Scale.Y, 0.1f, 10.0f);
+
+        // T2: de ce scalarea se face prin înmulțire și nu prin adunare:
+        // scalarea este o schimbare relativă (în procente), nu una absolută. Prin înmulțire, obiectul
+        // crește cu același procent pe secundă, oricât de mare sau de mic ar fi, iar Z urmat de X îl
+        // readuce exact la mărimea de dinainte (1,5 * 1/1,5 = 1). Prin adunare (scara += 0,5 * dt),
+        // un obiect mic s-ar schimba mult mai vizibil decât unul mare, iar la micșorare scara ar putea
+        // ajunge la 0 sau chiar negativă (obiectul s-ar turti, apoi s-ar oglindi). Înmulțirea cu un
+        // factor pozitiv nu duce niciodată scara la 0.
 
         if (KeyboardState.IsKeyPressed(Keys.Tab)) _selected = (_selected + 1) % _scene.Count;
         if (KeyboardState.IsKeyPressed(Keys.O)) _camera.IsPerspective = !_camera.IsPerspective;
