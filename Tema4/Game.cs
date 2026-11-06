@@ -64,7 +64,12 @@ public class Game : GameWindow
         AddObject("pătrat", Shapes.Quad(),
                   new Transform2D { Position = new Vector2(-1.8f, -1.0f), Depth = -3.0f });
         AddObject("triunghi", Shapes.Triangle(),
-                  new Transform2D { Position = new Vector2(-1.2f, 1.0f) });
+          new Transform2D
+          {
+              Position = new Vector2(-1.2f, 1.0f),
+              Rotation = 45,
+              Scale = new Vector2(1.5f, 0.5f)
+          });
         AddObject("hexagon", Shapes.RegularPolygon(6, 0.5f),
                   new Transform2D { Position = new Vector2(2.0f, 1.0f) });
         AddObject("cerc", Shapes.RegularPolygon(64, 0.5f),
@@ -103,17 +108,17 @@ public class Game : GameWindow
         SceneObject sel = _scene[_selected];
 
         const float moveSpeed = 2.0f;   // unități de lume pe secundă
-        if (KeyboardState.IsKeyDown(Keys.Left))  sel.Transform.Position.X -= moveSpeed * dt;
+        if (KeyboardState.IsKeyDown(Keys.Left)) sel.Transform.Position.X -= moveSpeed * dt;
         if (KeyboardState.IsKeyDown(Keys.Right)) sel.Transform.Position.X += moveSpeed * dt;
-        if (KeyboardState.IsKeyDown(Keys.Down))  sel.Transform.Position.Y -= moveSpeed * dt;
-        if (KeyboardState.IsKeyDown(Keys.Up))    sel.Transform.Position.Y += moveSpeed * dt;
+        if (KeyboardState.IsKeyDown(Keys.Down)) sel.Transform.Position.Y -= moveSpeed * dt;
+        if (KeyboardState.IsKeyDown(Keys.Up)) sel.Transform.Position.Y += moveSpeed * dt;
 
         // TODO (T2): Q / E rotesc obiectul, Z / X îl scalează
 
         if (KeyboardState.IsKeyPressed(Keys.Tab)) _selected = (_selected + 1) % _scene.Count;
-        if (KeyboardState.IsKeyPressed(Keys.O))   _camera.IsPerspective = !_camera.IsPerspective;
-        if (KeyboardState.IsKeyPressed(Keys.F))   _wireframe = !_wireframe;
-        if (KeyboardState.IsKeyPressed(Keys.R))   ResetScene();
+        if (KeyboardState.IsKeyPressed(Keys.O)) _camera.IsPerspective = !_camera.IsPerspective;
+        if (KeyboardState.IsKeyPressed(Keys.F)) _wireframe = !_wireframe;
+        if (KeyboardState.IsKeyPressed(Keys.R)) ResetScene();
 
         if (KeyboardState.IsKeyPressed(Keys.Tab) || KeyboardState.IsKeyPressed(Keys.O) ||
             KeyboardState.IsKeyPressed(Keys.R))
