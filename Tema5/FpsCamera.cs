@@ -63,7 +63,9 @@ public class FpsCamera : Camera
         // TODO 5.5 (a): deplasarea pe orizontală modifică yaw, cea pe verticală modifică pitch.
         //               Atenție: pe ecran Y crește în jos, iar pitch pozitiv înseamnă privire în sus.
         //               Apoi limitați pitch-ul la intervalul [-MaxPitch, MaxPitch].
-
+        Yaw += mouseDelta.X * MouseSensitivity;
+        Pitch -= mouseDelta.Y * MouseSensitivity;   // minus: pe ecran Y crește în jos, iar pitch pozitiv = privire în sus
+        Pitch = Math.Clamp(Pitch, -MaxPitch, MaxPitch);
 
         UpdateVectors();
 
@@ -96,10 +98,16 @@ if (mouse.ScrollDelta.Y != 0.0f)
     {
         // TODO 5.5 (b): Front din yaw și pitch (formula din secțiunea 5.2), apoi Right și Up
         //               prin produse vectoriale; toți trei normalizați.
-        //               Până atunci camera privește mereu spre -Z.
-        _front = -Vector3.UnitZ;
-        _right = Vector3.UnitX;
-        _up = Vector3.UnitY;
+        float yaw = MathHelper.DegreesToRadians(Yaw);
+        float pitch = MathHelper.DegreesToRadians(Pitch);
+
+        _front = Vector3.Normalize(new Vector3(
+            MathF.Cos(yaw) * MathF.Cos(pitch),
+            MathF.Sin(pitch),
+            MathF.Sin(yaw) * MathF.Cos(pitch)));
+
+        _right = Vector3.Normalize(Vector3.Cross(_front, WorldUp));
+        _up = Vector3.Normalize(Vector3.Cross(_right, _front));
     }
 
     public override void Reset()
