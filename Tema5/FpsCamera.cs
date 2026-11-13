@@ -81,12 +81,34 @@ if (mouse.ScrollDelta.Y != 0.0f)
 
         // --- 3. Deplasarea: W A S D ---------------------------------------------------
 
-        // TODO 5.6: direcția "înainte" (în modul mers: proiecția lui Front pe planul orizontal),
-        //           apoi deplasarea cu viteză constantă, independentă de numărul de cadre pe secundă.
-        //           Pași: (1) forward; (2) vectorul "move" = suma direcțiilor tastelor apăsate
-        //           (W +forward, S -forward, D +_right, A -_right); (3) normalizați "move";
-        //           (4) _position += move * viteză * dt (viteza crește de SprintFactor ori cu Shift stânga).
+        // (1) "înainte" în modul mers = Front proiectat pe planul orizontal (y = 0), apoi normalizat
+        Vector3 forward = new Vector3(_front.X, 0.0f, _front.Z);
+        if (forward.LengthSquared > 0.0f)
+        {
+            forward.Normalize();
+        }
 
+        // (2) suma direcțiilor tastelor apăsate
+        Vector3 move = Vector3.Zero;
+        if (keyboard.IsKeyDown(Keys.W)) move += forward;
+        if (keyboard.IsKeyDown(Keys.S)) move -= forward;
+        if (keyboard.IsKeyDown(Keys.D)) move += _right;
+        if (keyboard.IsKeyDown(Keys.A)) move -= _right;
+
+        // (3) normalizăm, ca pe diagonală (W + D) să nu fim mai rapizi
+        //     (dacă nicio tastă nu e apăsată, move e vectorul nul și nu se normalizează)
+        if (move.LengthSquared > 0.0f)
+        {
+            move.Normalize();
+        }
+
+        // (4) poziție += direcție · viteză · dt (Shift stânga = sprint)
+        float speed = MoveSpeed;
+        if (keyboard.IsKeyDown(Keys.LeftShift))
+        {
+            speed *= SprintFactor;
+        }
+        _position += move * speed * dt;
         // TODO 5.7 (facultativ): în zbor liber (FreeFly), "forward" este chiar _front,
         //           iar Space urcă și Ctrl stânga coboară (pe axa Y a lumii, WorldUp).
     }
